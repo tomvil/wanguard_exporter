@@ -25,7 +25,7 @@ type Announcement struct {
 }
 
 type Time struct {
-	Unixtime string
+	Time string `json:"iso_8601"`
 }
 
 func NewAnnouncementsCollector(wgclient *wgc.Client) *AnnouncementsCollector {
@@ -56,7 +56,7 @@ func collectActiveAnnouncements(desc *prometheus.Desc, wgclient *wgc.Client, ch 
 	}
 
 	for _, announcement := range announcements {
-		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, 1, announcement.Prefix, announcement.From.Unixtime, announcement.Until.Unixtime)
+		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, 1, announcement.Prefix, announcement.From.Time, announcement.Until.Time)
 	}
 }
 
