@@ -46,11 +46,11 @@ func main() {
 	}
 
 	if *apiPassword == "" {
-		*apiPassword = os.Getenv("wanguard_api_password")
+		*apiPassword = os.Getenv("WANGUARD_PASSWORD")
 		if *apiPassword == "" {
 			log.Errorln(`Please set the WANGuard API Password!
 		API Password can be set with api.password flag or
-		by setting wanguard_api_password environment variable.`)
+		by setting WANGUARD_PASSWORD environment variable.`)
 			os.Exit(1)
 		}
 	}
