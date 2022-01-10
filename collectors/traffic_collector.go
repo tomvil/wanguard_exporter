@@ -53,7 +53,7 @@ type IPProtocolTop struct {
 }
 
 type IPProtocol struct {
-	IPProtocol string `json:"description"`
+	IPProtocol int `json:"ip_protocol"`
 	Value      int
 }
 
@@ -66,21 +66,27 @@ type Talker struct {
 	Value     int
 }
 
-var protocol = map[string]string{
-	"User Datagram":            "UDP",
-	"Transmission Control":     "TCP",
-	"Internet Control Message": "ICMP",
-	"ICMP for IPv6":            "ICMPv6",
+var protocol = map[int]string{
+	1:  "ICMP",
+	2:  "IGMP",
+	6:  "TCP",
+	17: "UDP",
+	47: "GRE",
+	50: "ESP",
+	51: "AH",
+	58: "ICMPv6",
+	88: "EIGRP",
+	89: "OSPF",
 }
 
 func NewTrafficCollector(wgclient *wgc.Client) *TrafficCollector {
 	prefix := "wanguard_traffic_"
 	return &TrafficCollector{
 		wgClient:            wgclient,
-		CountryTopPPSIn:     prometheus.NewDesc(prefix+"country_packets_per_second_in", "Packets per second in by country", []string{"country"}, nil),
-		CountryTopPPSOut:    prometheus.NewDesc(prefix+"country_packets_per_second_out", "Packets per second out by country", []string{"country"}, nil),
-		CountryTopBPSIn:     prometheus.NewDesc(prefix+"country_bits_per_second_in", "Bits per second in by country", []string{"country"}, nil),
-		CountryTopBPSOut:    prometheus.NewDesc(prefix+"country_bits_per_second_out", "Bits per second out by country", []string{"country"}, nil),
+		CountryTopPPSIn:     prometheus.NewDesc(prefix+"country_packets_per_second_in", "Packets per second in by country", []string{"country", "country_code"}, nil),
+		CountryTopPPSOut:    prometheus.NewDesc(prefix+"country_packets_per_second_out", "Packets per second out by country", []string{"country", "country_code"}, nil),
+		CountryTopBPSIn:     prometheus.NewDesc(prefix+"country_bits_per_second_in", "Bits per second in by country", []string{"country", "country_code"}, nil),
+		CountryTopBPSOut:    prometheus.NewDesc(prefix+"country_bits_per_second_out", "Bits per second out by country", []string{"country", "country_code"}, nil),
 		IPVersionTopPPSIn:   prometheus.NewDesc(prefix+"ip_version_packets_per_second_in", "Packets per second in by IP version", []string{"ip_version"}, nil),
 		IPVersionTopPPSOut:  prometheus.NewDesc(prefix+"ip_version_packets_per_second_out", "Packets per second out by IP version", []string{"ip_version"}, nil),
 		IPVersionTopBPSIn:   prometheus.NewDesc(prefix+"ip_version_bits_per_second_in", "Bits per second in by IP version", []string{"ip_version"}, nil),
@@ -155,7 +161,7 @@ func collectTopTrafficByCountry(desc *prometheus.Desc, ch chan<- prometheus.Metr
 
 	for i := 1; i <= len(countryTop.Top); i++ {
 		k := strconv.Itoa(i)
-		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, float64(countryTop.Top[k].Value), countries.ByName(countryTop.Top[k].Country).Alpha2())
+		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, float64(countryTop.Top[k].Value), countryTop.Top[k].Country, countries.ByName(countryTop.Top[k].Country).Alpha2())
 	}
 
 	defer wsync.Done()
