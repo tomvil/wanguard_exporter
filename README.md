@@ -1,5 +1,5 @@
 # wanguard_exporter
-This is prometheus exporter for WANGuard API.
+This is prometheus exporter for Andrisoft WANGuard API.
 
 ## Install
 ```go install github.com/tomvil/wanguard_exporter@latest```
