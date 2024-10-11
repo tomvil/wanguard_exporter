@@ -27,7 +27,7 @@ func NewActionsCollector(wgclient *wgc.Client) *ActionsCollector {
 	prefix := "wanguard_action_"
 	return &ActionsCollector{
 		wgClient:     wgclient,
-		ActionStatus: prometheus.NewDesc(prefix+"status", "Status of the response actions", []string{"action_name", "action_type", "response_branch"}, nil),
+		ActionStatus: prometheus.NewDesc(prefix+"status", "Status of the response actions", []string{"response_name", "action_name", "action_type", "response_branch"}, nil),
 	}
 }
 
@@ -60,9 +60,9 @@ func (c *ActionsCollector) Collect(ch chan<- prometheus.Metric) {
 			}
 
 			if params["status"] == "Active" {
-				ch <- prometheus.MustNewConstMetric(c.ActionStatus, prometheus.GaugeValue, 1, action.ActionName, action.ActionType, action.ResponseBranch)
+				ch <- prometheus.MustNewConstMetric(c.ActionStatus, prometheus.GaugeValue, 1, response.ResponseName, action.ActionName, action.ActionType, action.ResponseBranch)
 			} else {
-				ch <- prometheus.MustNewConstMetric(c.ActionStatus, prometheus.GaugeValue, 0, action.ActionName, action.ActionType, action.ResponseBranch)
+				ch <- prometheus.MustNewConstMetric(c.ActionStatus, prometheus.GaugeValue, 0, response.ResponseName, action.ActionName, action.ActionType, action.ResponseBranch)
 			}
 
 		}
