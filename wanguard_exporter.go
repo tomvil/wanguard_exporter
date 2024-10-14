@@ -17,6 +17,11 @@ const (
 	version string = "1.1"
 )
 
+type collectorsList struct {
+	enabled   *bool
+	collector prometheus.Collector
+}
+
 var (
 	showVersion = flag.Bool("version", false, "Print version and other information about wanguard_exporter")
 	listenAddr  = flag.String("web.listen-address", ":9868", "The address to listen on for HTTP requests")
@@ -32,6 +37,8 @@ var (
 	actionsCollectorEnabled       = flag.Bool("collector.actions", true, "Expose actions metrics")
 	sensorsCollectorEnabled       = flag.Bool("collector.sensors", true, "Expose sensors metrics")
 	trafficCollectorEnabled       = flag.Bool("collector.traffic", true, "Expose traffic metrics")
+
+	cl []collectorsList
 )
 
 func main() {
@@ -53,6 +60,17 @@ func main() {
 		by setting WANGUARD_PASSWORD environment variable.`)
 			os.Exit(1)
 		}
+	}
+
+	wgClient := wgc.NewClient(*apiAddress, *apiUsername, *apiPassword)
+	cl = []collectorsList{
+		{licenseCollectorEnabled, collectors.NewLicenseCollector(wgClient)},
+		{announcementsCollectorEnabled, collectors.NewAnnouncementsCollector(wgClient)},
+		{anomaliesCollectorEnabled, collectors.NewAnomaliesCollector(wgClient)},
+		{componentsCollectorEnabled, collectors.NewComponentsCollector(wgClient)},
+		{actionsCollectorEnabled, collectors.NewActionsCollector(wgClient)},
+		{sensorsCollectorEnabled, collectors.NewSensorsCollector(wgClient)},
+		{trafficCollectorEnabled, collectors.NewTrafficCollector(wgClient)},
 	}
 
 	startServer()
@@ -83,28 +101,11 @@ func startServer() {
 
 func handleMetricsRequest(w http.ResponseWriter, r *http.Request) {
 	registry := prometheus.NewRegistry()
-	wgclient := wgc.NewClient(*apiAddress, *apiUsername, *apiPassword)
 
-	if *licenseCollectorEnabled {
-		registry.MustRegister(collectors.NewLicenseCollector(wgclient))
-	}
-	if *announcementsCollectorEnabled {
-		registry.MustRegister(collectors.NewAnnouncementsCollector(wgclient))
-	}
-	if *anomaliesCollectorEnabled {
-		registry.MustRegister(collectors.NewAnomaliesCollector(wgclient))
-	}
-	if *componentsCollectorEnabled {
-		registry.MustRegister(collectors.NewComponentsCollector(wgclient))
-	}
-	if *actionsCollectorEnabled {
-		registry.MustRegister(collectors.NewActionsCollector(wgclient))
-	}
-	if *sensorsCollectorEnabled {
-		registry.MustRegister(collectors.NewSensorsCollector(wgclient))
-	}
-	if *trafficCollectorEnabled {
-		registry.MustRegister(collectors.NewTrafficCollector(wgclient))
+	for _, c := range cl {
+		if *c.enabled {
+			registry.MustRegister(c.collector)
+		}
 	}
 
 	promhttp.HandlerFor(registry, promhttp.HandlerOpts{
