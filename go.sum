@@ -97,6 +97,8 @@ github.com/stretchr/testify v1.4.0 h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJy
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/tomvil/countries v0.0.0-20220104165753-f0d74c0c9799 h1:WsFmU9SbaxwRxrCkI45yTjGJ4NRInkoE6C2URi68gbU=
 github.com/tomvil/countries v0.0.0-20220104165753-f0d74c0c9799/go.mod h1:DGwxkfl84qe5kzX5D6fljA6V+MEk8PvdVGT1MnDl5Js=
+github.com/tomvil/go-ipprotocols v0.0.0-20241014123012-278a27f8a73e h1:ZKGEs1IO5ZuJvoI7yfw92nRoiwwh5XiQXqnDl9CZqfU=
+github.com/tomvil/go-ipprotocols v0.0.0-20241014123012-278a27f8a73e/go.mod h1:U0UPn/og7dbWylgkF76EPY1gkkNo0IDnAK3dmzigLK0=
 golang.org/x/crypto v0.0.0-20180904163835-0709b304e793/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=

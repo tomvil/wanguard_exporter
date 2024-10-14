@@ -7,6 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/log"
 	"github.com/tomvil/countries"
+	"github.com/tomvil/go-ipprotocols"
 	wgc "github.com/tomvil/wanguard_exporter/client"
 )
 
@@ -64,19 +65,6 @@ type TalkerTop struct {
 type Talker struct {
 	IPAddress string `json:"ip_address"`
 	Value     int
-}
-
-var protocol = map[int]string{
-	1:  "ICMP",
-	2:  "IGMP",
-	6:  "TCP",
-	17: "UDP",
-	47: "GRE",
-	50: "ESP",
-	51: "AH",
-	58: "ICMPv6",
-	88: "EIGRP",
-	89: "OSPF",
 }
 
 func NewTrafficCollector(wgclient *wgc.Client) *TrafficCollector {
@@ -197,7 +185,12 @@ func collectTopTrafficByIPProtocol(desc *prometheus.Desc, ch chan<- prometheus.M
 
 	for i := 1; i <= len(ipProtocolTop.Top); i++ {
 		k := strconv.Itoa(i)
-		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, float64(ipProtocolTop.Top[k].Value), protocol[ipProtocolTop.Top[k].IPProtocol])
+		protocolName, err := ipprotocols.GetProtocolName(ipProtocolTop.Top[k].IPProtocol)
+		if err != nil {
+			log.Errorln("failed to get protocol name for protocol number: ", ipProtocolTop.Top[k].IPProtocol)
+			continue
+		}
+		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, float64(ipProtocolTop.Top[k].Value), protocolName)
 	}
 
 	defer wsync.Done()
