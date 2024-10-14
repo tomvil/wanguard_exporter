@@ -188,7 +188,6 @@ func collectTopTrafficByIPProtocol(desc *prometheus.Desc, ch chan<- prometheus.M
 		protocolName, err := ipprotocols.GetProtocolName(ipProtocolTop.Top[k].IPProtocol)
 		if err != nil {
 			log.Errorln("failed to get protocol name for protocol number: ", ipProtocolTop.Top[k].IPProtocol)
-			continue
 		}
 		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, float64(ipProtocolTop.Top[k].Value), protocolName)
 	}
