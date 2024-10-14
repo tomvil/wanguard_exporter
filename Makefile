@@ -1,4 +1,4 @@
-EXPORTER_VERSION=1.1
+EXPORTER_VERSION=1.2
 PACKAGES_DIR=compiled_packages
 
 all: test build clean
