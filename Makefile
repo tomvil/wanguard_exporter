@@ -21,6 +21,6 @@ run:
 	go run .
 
 compile:
-	GOARCH=amd64 GOOS=darwin go build -o ${PACKAGES_DIR}/wanguard_exporter-${EXPORTER_VERSION}-darwin
-	GOARCH=amd64 GOOS=linux go build -o ${PACKAGES_DIR}/wanguard_exporter-${EXPORTER_VERSION}-linux
-	GOARCH=amd64 GOOS=windows go build -o ${PACKAGES_DIR}/wanguard_exporter-${EXPORTER_VERSION}-windows
+	CGO_ENABLED=0 GOARCH=amd64 GOOS=darwin go build -o ${PACKAGES_DIR}/wanguard_exporter-${EXPORTER_VERSION}-darwin
+	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o ${PACKAGES_DIR}/wanguard_exporter-${EXPORTER_VERSION}-linux
+	CGO_ENABLED=0 GOARCH=amd64 GOOS=windows go build -o ${PACKAGES_DIR}/wanguard_exporter-${EXPORTER_VERSION}-windows
