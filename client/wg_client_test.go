@@ -86,7 +86,7 @@ func BenchmarkGetParsed(b *testing.B) {
 	}))
 	defer server.Close()
 
-	client := NewClient(server.URL, "user", "password")
+	client := NewClient(server.URL, "u", "p")
 
 	for i := 0; i < b.N; i++ {
 		var response Response
