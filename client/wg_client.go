@@ -3,7 +3,7 @@ package wgc
 import (
 	"encoding/base64"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -44,7 +44,7 @@ func (c *Client) Get(path string) ([]byte, error) {
 	}
 
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
