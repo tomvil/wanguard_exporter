@@ -19,6 +19,7 @@ type AnnouncementsCount struct {
 }
 
 type Announcement struct {
+	Id     string `json:"bgp_announcement_id"`
 	Prefix string
 	From   Time
 	Until  Time
@@ -28,7 +29,7 @@ func NewAnnouncementsCollector(wgclient *wgc.Client) *AnnouncementsCollector {
 	prefix := "wanguard_announcements_"
 	return &AnnouncementsCollector{
 		wgClient:                   wgclient,
-		AnnouncementActive:         prometheus.NewDesc(prefix+"active", "Active announcements at the moment", []string{"prefix", "from", "until"}, nil),
+		AnnouncementActive:         prometheus.NewDesc(prefix+"active", "Active announcements at the moment", []string{"prefix", "from", "until", "announcement_id"}, nil),
 		AnnouncementsFinishedTotal: prometheus.NewDesc(prefix+"total", "Total amount of announcements", nil, nil),
 	}
 }
@@ -46,13 +47,13 @@ func (c *AnnouncementsCollector) Collect(ch chan<- prometheus.Metric) {
 func collectActiveAnnouncements(desc *prometheus.Desc, wgclient *wgc.Client, ch chan<- prometheus.Metric) {
 	var announcements []Announcement
 
-	err := wgclient.GetParsed("bgp_announcements?status=Active&fields=prefix,from,until", &announcements)
+	err := wgclient.GetParsed("bgp_announcements?status=Active&fields=prefix,from,until,bgp_announcement_id", &announcements)
 	if err != nil {
 		return
 	}
 
 	for _, announcement := range announcements {
-		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, 1, announcement.Prefix, announcement.From.Time, announcement.Until.Time)
+		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, 1, announcement.Prefix, announcement.From.Time, announcement.Until.Time, announcement.Id)
 	}
 }
 
