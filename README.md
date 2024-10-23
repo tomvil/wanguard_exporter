@@ -20,6 +20,7 @@ componentsCollectorEnabled | Export components metrics | true
 actionsCollectorEnabled | Export actions metrics | true
 sensorsCollectorEnabled | Export sensors metrics | true
 trafficCollectorEnabled | Export traffic metrics | true
+firewallRulesCollectorEnabled | Export firewall rules metrics | true
 
 ## Configuration environment variables
 Name     | Description

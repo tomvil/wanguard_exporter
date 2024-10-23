@@ -24,10 +24,6 @@ type Announcement struct {
 	Until  Time
 }
 
-type Time struct {
-	Time string `json:"iso_8601"`
-}
-
 func NewAnnouncementsCollector(wgclient *wgc.Client) *AnnouncementsCollector {
 	prefix := "wanguard_announcements_"
 	return &AnnouncementsCollector{
