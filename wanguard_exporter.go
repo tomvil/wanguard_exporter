@@ -37,6 +37,7 @@ var (
 	actionsCollectorEnabled       = flag.Bool("collector.actions", true, "Expose actions metrics")
 	sensorsCollectorEnabled       = flag.Bool("collector.sensors", true, "Expose sensors metrics")
 	trafficCollectorEnabled       = flag.Bool("collector.traffic", true, "Expose traffic metrics")
+	firewallRulesCollectorEnabled = flag.Bool("collector.firewall_rules", true, "Expose firewall rules metrics")
 
 	cl []collectorsList
 )
@@ -71,6 +72,7 @@ func main() {
 		{actionsCollectorEnabled, collectors.NewActionsCollector(wgClient)},
 		{sensorsCollectorEnabled, collectors.NewSensorsCollector(wgClient)},
 		{trafficCollectorEnabled, collectors.NewTrafficCollector(wgClient)},
+		{firewallRulesCollectorEnabled, collectors.NewFirewallRulesCollector(wgClient)},
 	}
 
 	startServer()
