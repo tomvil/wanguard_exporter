@@ -10,47 +10,63 @@ import (
 )
 
 type LicenseCollector struct {
-	wgClient                    *wgc.Client
-	LicensedSensors             *prometheus.Desc
-	LicensedSensorsUsed         *prometheus.Desc
-	LicensedSensorsRemaining    *prometheus.Desc
-	LicensedFilters             *prometheus.Desc
-	LicensedFiltersUsed         *prometheus.Desc
-	LicensedFiltersRemaining    *prometheus.Desc
-	LicenseDaysRemaining        *prometheus.Desc
-	LicenseSupportDaysRemaining *prometheus.Desc
+	wgClient                     *wgc.Client
+	SoftwareVersion              *prometheus.Desc
+	LicensedSensors              *prometheus.Desc
+	LicensedSensorsUsed          *prometheus.Desc
+	LicensedSensorsRemaining     *prometheus.Desc
+	LicensedDpdkEngines          *prometheus.Desc
+	LicensedDpdkEnginesUsed      *prometheus.Desc
+	LicensedDpdkEnginesRemaining *prometheus.Desc
+	LicensedFilters              *prometheus.Desc
+	LicensedFiltersUsed          *prometheus.Desc
+	LicensedFiltersRemaining     *prometheus.Desc
+	LicenseDaysRemaining         *prometheus.Desc
+	LicenseSupportDaysRemaining  *prometheus.Desc
 }
 
 type License struct {
-	LicensedSensors             interface{} `json:"licensed_sensors"`
-	LicensedSensorsUsed         interface{} `json:"licensed_sensors_used"`
-	LicensedSensorsRemaining    interface{} `json:"licensed_sensors_remaining"`
-	LicensedFilters             interface{} `json:"licensed_filters"`
-	LicensedFiltersUsed         interface{} `json:"licensed_filters_used"`
-	LicensedFiltersRemaining    interface{} `json:"licensed_filters_remaining"`
-	LicenseDaysRemaining        interface{} `json:"license_expiry_date_remaining"`
-	LicenseSupportDaysRemaining interface{} `json:"support_expiry_date_remaining"`
+	SoftwareVersion              string      `json:"software_version"`
+	LicensedSensors              interface{} `json:"licensed_sensors"`
+	LicensedSensorsUsed          interface{} `json:"licensed_sensors_used"`
+	LicensedSensorsRemaining     interface{} `json:"licensed_sensors_remaining"`
+	LicensedDpdkEngines          interface{} `json:"licensed_dpdk_engines"`
+	LicensedDpdkEnginesUsed      interface{} `json:"licensed_dpdk_engines_used"`
+	LicensedDpdkEnginesRemaining interface{} `json:"licensed_dpdk_engines_remaining"`
+	LicensedFilters              interface{} `json:"licensed_filters"`
+	LicensedFiltersUsed          interface{} `json:"licensed_filters_used"`
+	LicensedFiltersRemaining     interface{} `json:"licensed_filters_remaining"`
+	LicenseDaysRemaining         interface{} `json:"license_expiry_date_remaining"`
+	LicenseSupportDaysRemaining  interface{} `json:"support_expiry_date_remaining"`
 }
 
 func NewLicenseCollector(wgclient *wgc.Client) *LicenseCollector {
 	prefix := "wanguard_license_"
 	return &LicenseCollector{
-		wgClient:                    wgclient,
-		LicensedSensors:             prometheus.NewDesc(prefix+"sensors_total", "Licensed sensors total", nil, nil),
-		LicensedSensorsUsed:         prometheus.NewDesc(prefix+"sensors_used", "Licensed sensors used", nil, nil),
-		LicensedSensorsRemaining:    prometheus.NewDesc(prefix+"sensors_remaining", "Licensed sensors remaining", nil, nil),
-		LicensedFilters:             prometheus.NewDesc(prefix+"filters", "Licensed filters total", nil, nil),
-		LicensedFiltersUsed:         prometheus.NewDesc(prefix+"filters_used", "Licensed filters total", nil, nil),
-		LicensedFiltersRemaining:    prometheus.NewDesc(prefix+"filters_remaining", "Licensed filters available", nil, nil),
-		LicenseDaysRemaining:        prometheus.NewDesc(prefix+"days_remaining", "License days remaining", nil, nil),
-		LicenseSupportDaysRemaining: prometheus.NewDesc(prefix+"support_days_remaining", "Support license days remaining", nil, nil),
+		wgClient:                     wgclient,
+		SoftwareVersion:              prometheus.NewDesc(prefix+"software_version", "Software version", []string{"software_version"}, nil),
+		LicensedSensors:              prometheus.NewDesc(prefix+"sensors_total", "Licensed sensors total", nil, nil),
+		LicensedSensorsUsed:          prometheus.NewDesc(prefix+"sensors_used", "Licensed sensors used", nil, nil),
+		LicensedSensorsRemaining:     prometheus.NewDesc(prefix+"sensors_remaining", "Licensed sensors remaining", nil, nil),
+		LicensedDpdkEngines:          prometheus.NewDesc(prefix+"dpdk_engines_total", "Licensed DPDK engines total", nil, nil),
+		LicensedDpdkEnginesUsed:      prometheus.NewDesc(prefix+"dpdk_engines_used", "Licensed DPDK engines used", nil, nil),
+		LicensedDpdkEnginesRemaining: prometheus.NewDesc(prefix+"dpdk_engines_remaining", "Licensed DPDK engines remaining", nil, nil),
+		LicensedFilters:              prometheus.NewDesc(prefix+"filters", "Licensed filters total", nil, nil),
+		LicensedFiltersUsed:          prometheus.NewDesc(prefix+"filters_used", "Licensed filters total", nil, nil),
+		LicensedFiltersRemaining:     prometheus.NewDesc(prefix+"filters_remaining", "Licensed filters available", nil, nil),
+		LicenseDaysRemaining:         prometheus.NewDesc(prefix+"days_remaining", "License days remaining", nil, nil),
+		LicenseSupportDaysRemaining:  prometheus.NewDesc(prefix+"support_days_remaining", "Support license days remaining", nil, nil),
 	}
 }
 
 func (c *LicenseCollector) Describe(ch chan<- *prometheus.Desc) {
+	ch <- c.SoftwareVersion
 	ch <- c.LicensedSensors
 	ch <- c.LicensedSensorsUsed
 	ch <- c.LicensedSensorsRemaining
+	ch <- c.LicensedDpdkEngines
+	ch <- c.LicensedDpdkEnginesUsed
+	ch <- c.LicensedDpdkEnginesRemaining
 	ch <- c.LicensedFilters
 	ch <- c.LicensedFiltersUsed
 	ch <- c.LicensedFiltersRemaining
@@ -71,9 +87,13 @@ func (c *LicenseCollector) Collect(ch chan<- prometheus.Metric) {
 		)
 	}
 
+	ch <- prometheus.MustNewConstMetric(c.SoftwareVersion, prometheus.GaugeValue, 1, license.SoftwareVersion)
 	ch <- prometheus.MustNewConstMetric(c.LicensedSensors, prometheus.GaugeValue, getFloat64(license.LicensedSensors))
 	ch <- prometheus.MustNewConstMetric(c.LicensedSensorsUsed, prometheus.GaugeValue, getFloat64(license.LicensedSensorsUsed))
 	ch <- prometheus.MustNewConstMetric(c.LicensedSensorsRemaining, prometheus.GaugeValue, getFloat64(license.LicensedSensorsRemaining))
+	ch <- prometheus.MustNewConstMetric(c.LicensedDpdkEngines, prometheus.GaugeValue, getFloat64(license.LicensedDpdkEngines))
+	ch <- prometheus.MustNewConstMetric(c.LicensedDpdkEnginesUsed, prometheus.GaugeValue, getFloat64(license.LicensedDpdkEnginesUsed))
+	ch <- prometheus.MustNewConstMetric(c.LicensedDpdkEnginesRemaining, prometheus.GaugeValue, getFloat64(license.LicensedDpdkEnginesRemaining))
 	ch <- prometheus.MustNewConstMetric(c.LicensedFilters, prometheus.GaugeValue, getFloat64(license.LicensedFilters))
 	ch <- prometheus.MustNewConstMetric(c.LicensedFiltersUsed, prometheus.GaugeValue, getFloat64(license.LicensedFiltersUsed))
 	ch <- prometheus.MustNewConstMetric(c.LicensedFiltersRemaining, prometheus.GaugeValue, getFloat64(license.LicensedFiltersRemaining))
