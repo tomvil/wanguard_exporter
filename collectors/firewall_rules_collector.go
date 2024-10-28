@@ -67,20 +67,14 @@ func (c *FirewallRulesCollector) Collect(ch chan<- prometheus.Metric) {
 }
 
 func collectFirewallRules(desc *prometheus.Desc, wgclient *wgc.Client, ch chan<- prometheus.Metric) {
-	var rules []map[string]string
+	var rules []FirewallRule
 
-	err := wgclient.GetParsed("firewall_rules", &rules)
+	err := wgclient.GetParsed("firewall_rules?fields=firewall_rule_id,attack_id,source_prefix,destination_prefix,ip_protocol,from,until,pkts/s,bits/s,max_pkts/s,max_bits/s,pkts,bits", &rules)
 	if err != nil {
 		return
 	}
 
-	for _, r := range rules {
-		var rule FirewallRule
-		err = wgclient.GetParsed(r["href"], &rule)
-		if err != nil {
-			return
-		}
-
+	for _, rule := range rules {
 		ch <- prometheus.MustNewConstMetric(
 			desc,
 			prometheus.GaugeValue,
