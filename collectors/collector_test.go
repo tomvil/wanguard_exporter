@@ -68,6 +68,20 @@ func TestMain(m *testing.M) {
 		}
 	})
 
+	mux.HandleFunc("/wanguard-api/v1/bgp_announcements", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("status") == "Finished" && r.URL.Query().Get("count") == "true" {
+			if _, err := w.Write([]byte(`{"count": "1"}`)); err != nil {
+				log.Errorln(err.Error())
+			}
+		}
+
+		if r.URL.Query().Get("status") == "Active" && r.URL.Query().Get("fields") != "" {
+			if _, err := w.Write([]byte(announcementsPayload())); err != nil {
+				log.Errorln(err.Error())
+			}
+		}
+	})
+
 	server := httptest.NewServer(mux)
 	defer server.Close()
 
@@ -150,6 +164,24 @@ func sensorsPayload() string {
     "flow_sensor_id": "1",
     "sensor_name": "Flow Sensor 1",
     "href": "/wanguard-api/v1/flow_sensors/1"
+  }
+]`
+}
+
+func announcementsPayload() string {
+	return `[
+  {
+    "bgp_announcement_id": "1",
+    "prefix": "10.10.10.10/32",
+    "from": {
+      "iso_8601": "2024-10-23 09:31:01",
+      "unixtime": "1729675861"
+    },
+    "until": {
+      "iso_8601": "",
+      "unixtime": ""
+    },
+    "href": "/wanguard-api/v1/bgp_announcements/1"
   }
 ]`
 }
