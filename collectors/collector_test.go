@@ -82,6 +82,20 @@ func TestMain(m *testing.M) {
 		}
 	})
 
+	mux.HandleFunc("/wanguard-api/v1/anomalies", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("status") == "Finished" && r.URL.Query().Get("count") == "true" {
+			if _, err := w.Write([]byte(`{"count": "1"}`)); err != nil {
+				log.Errorln(err.Error())
+			}
+		}
+
+		if r.URL.Query().Get("status") == "Active" && r.URL.Query().Get("fields") != "" {
+			if _, err := w.Write([]byte(anomaliesPayload())); err != nil {
+				log.Errorln(err.Error())
+			}
+		}
+	})
+
 	server := httptest.NewServer(mux)
 	defer server.Close()
 
@@ -182,6 +196,21 @@ func announcementsPayload() string {
       "unixtime": ""
     },
     "href": "/wanguard-api/v1/bgp_announcements/1"
+  }
+]`
+}
+
+func anomaliesPayload() string {
+	return `[
+  {
+    "prefix": "10.10.10.10/32",
+    "anomaly": "ICMP pkts/s > 1",
+    "duration": "60",
+    "pkts/s": "17500",
+    "bits/s": "9014400",
+    "packets": "320020500",
+    "bits": "169576384000",
+    "href": "/wanguard-api/v1/anomalies/1"
   }
 ]`
 }
