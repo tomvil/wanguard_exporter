@@ -32,6 +32,42 @@ func TestMain(m *testing.M) {
 		}
 	})
 
+	mux.HandleFunc("/wanguard-api/v1/bgp_connectors", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := w.Write([]byte(bgpConnectorsPayload())); err != nil {
+			log.Errorln(err.Error())
+		}
+	})
+
+	mux.HandleFunc("/wanguard-api/v1/bgp_connectors/1/status", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := w.Write([]byte(`{"status": "Active"}`)); err != nil {
+			log.Errorln(err.Error())
+		}
+	})
+
+	mux.HandleFunc("/wanguard-api/v1/filters", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := w.Write([]byte(filtersPayload())); err != nil {
+			log.Errorln(err.Error())
+		}
+	})
+
+	mux.HandleFunc("/wanguard-api/v1/packet_filters/1/status", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := w.Write([]byte(`{"status": "Active"}`)); err != nil {
+			log.Errorln(err.Error())
+		}
+	})
+
+	mux.HandleFunc("/wanguard-api/v1/sensors", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := w.Write([]byte(sensorsPayload())); err != nil {
+			log.Errorln(err.Error())
+		}
+	})
+
+	mux.HandleFunc("/wanguard-api/v1/flow_sensors/1/status", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := w.Write([]byte(`{"status": "Active"}`)); err != nil {
+			log.Errorln(err.Error())
+		}
+	})
+
 	server := httptest.NewServer(mux)
 	defer server.Close()
 
@@ -84,6 +120,36 @@ func firewallRulesPayload() string {
     "pkts": "0",
     "bits": "0",
     "href": "/wanguard-api/v1/firewall_rules/1"
+  }
+]`
+}
+
+func bgpConnectorsPayload() string {
+	return `[
+  {
+    "bgp_connector_id": "1",
+    "bgp_connector_name": "BGP Connector 1",
+    "href": "/wanguard-api/v1/bgp_connectors/1"
+  }
+]`
+}
+
+func filtersPayload() string {
+	return `[
+  {
+    "packet_filter_id": "1",
+    "filter_name": "Packet Filter 1",
+    "href": "/wanguard-api/v1/packet_filters/1"
+  }
+]`
+}
+
+func sensorsPayload() string {
+	return `[
+  {
+    "flow_sensor_id": "1",
+    "sensor_name": "Flow Sensor 1",
+    "href": "/wanguard-api/v1/flow_sensors/1"
   }
 ]`
 }
