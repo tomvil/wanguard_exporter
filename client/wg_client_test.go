@@ -6,6 +6,8 @@ import (
 	"testing"
 )
 
+const errMsgExpectedNoError = "Expected no error, got %s"
+
 type Response struct {
 	Test string `json:"test"`
 }
@@ -47,7 +49,7 @@ func TestGet(t *testing.T) {
 		}
 
 		if _, err := w.Write([]byte("test")); err != nil {
-			t.Errorf("Expected no error, got %s", err)
+			t.Errorf(errMsgExpectedNoError, err)
 		}
 	}))
 	defer server.Close()
@@ -55,7 +57,7 @@ func TestGet(t *testing.T) {
 	client := NewClient(server.URL, "u", "p")
 	body, err := client.Get("/test")
 	if err != nil {
-		t.Errorf("Expected no error, got %s", err)
+		t.Errorf(errMsgExpectedNoError, err)
 	}
 
 	if string(body) != "test" {
@@ -66,7 +68,7 @@ func TestGet(t *testing.T) {
 func TestGetParsed(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if _, err := w.Write([]byte(`{"test": "success"}`)); err != nil {
-			t.Errorf("Expected no error, got %s", err)
+			t.Errorf(errMsgExpectedNoError, err)
 		}
 	}))
 	defer server.Close()
@@ -76,7 +78,7 @@ func TestGetParsed(t *testing.T) {
 	var response Response
 	err := client.GetParsed("/test", &response)
 	if err != nil {
-		t.Errorf("Expected no error, got %s", err)
+		t.Errorf(errMsgExpectedNoError, err)
 	}
 
 	if response.Test != "success" {
@@ -87,7 +89,7 @@ func TestGetParsed(t *testing.T) {
 func BenchmarkGetParsed(b *testing.B) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if _, err := w.Write([]byte(`{"test": "success"}`)); err != nil {
-			b.Errorf("Expected no error, got %s", err)
+			b.Errorf(errMsgExpectedNoError, err)
 		}
 	}))
 	defer server.Close()
@@ -98,7 +100,7 @@ func BenchmarkGetParsed(b *testing.B) {
 		var response Response
 		err := client.GetParsed("/test", &response)
 		if err != nil {
-			b.Errorf("Expected no error, got %s", err)
+			b.Errorf(errMsgExpectedNoError, err)
 		}
 	}
 }
