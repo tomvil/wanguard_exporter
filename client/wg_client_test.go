@@ -46,7 +46,9 @@ func TestGet(t *testing.T) {
 			t.Errorf("Expected %s, got %s", expectedAuth, authHeader)
 		}
 
-		w.Write([]byte("test"))
+		if _, err := w.Write([]byte("test")); err != nil {
+			t.Errorf("Expected no error, got %s", err)
+		}
 	}))
 	defer server.Close()
 
@@ -63,7 +65,9 @@ func TestGet(t *testing.T) {
 
 func TestGetParsed(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`{"test": "success"}`))
+		if _, err := w.Write([]byte(`{"test": "success"}`)); err != nil {
+			t.Errorf("Expected no error, got %s", err)
+		}
 	}))
 	defer server.Close()
 
@@ -82,7 +86,9 @@ func TestGetParsed(t *testing.T) {
 
 func BenchmarkGetParsed(b *testing.B) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`{"test": "success"}`))
+		if _, err := w.Write([]byte(`{"test": "success"}`)); err != nil {
+			b.Errorf("Expected no error, got %s", err)
+		}
 	}))
 	defer server.Close()
 
@@ -90,6 +96,9 @@ func BenchmarkGetParsed(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		var response Response
-		client.GetParsed("/test", &response)
+		err := client.GetParsed("/test", &response)
+		if err != nil {
+			b.Errorf("Expected no error, got %s", err)
+		}
 	}
 }

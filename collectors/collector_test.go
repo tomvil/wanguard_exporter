@@ -5,22 +5,30 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+
+	"github.com/prometheus/common/log"
 )
 
 func TestMain(m *testing.M) {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/wanguard-api/v1/license_manager", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(licenseManagerPayload()))
+		if _, err := w.Write([]byte(licenseManagerPayload())); err != nil {
+			log.Errorln(err.Error())
+		}
 	})
 
 	mux.HandleFunc("/wanguard-api/v1/firewall_rules", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("count") == "true" {
-			w.Write([]byte(`{"count": "1"}`))
+			if _, err := w.Write([]byte(`{"count": "1"}`)); err != nil {
+				log.Errorln(err.Error())
+			}
 		}
 
 		if r.URL.Query().Get("fields") == "firewall_rule_id,attack_id,source_prefix,destination_prefix,ip_protocol,from,until,pkts/s,bits/s,max_pkts/s,max_bits/s,pkts,bits" {
-			w.Write([]byte(firewallRulesPayload()))
+			if _, err := w.Write([]byte(firewallRulesPayload())); err != nil {
+				log.Errorln(err.Error())
+			}
 		}
 	})
 
