@@ -114,6 +114,12 @@ func TestMain(m *testing.M) {
 		}
 	})
 
+	mux.HandleFunc("/wanguard-api/v1/sensor_live_stats", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := w.Write([]byte(sensorLiveStatsPayload())); err != nil {
+			log.Errorln(err.Error())
+		}
+	})
+
 	server := httptest.NewServer(mux)
 	defer server.Close()
 
@@ -254,6 +260,42 @@ func actionsPayload() string {
     "action_type": "Send a custom Syslog message",
     "response_branch": "When an anomaly is detected",
     "href": "/wanguard-api/v1/responses/1/actions/1"
+  }
+]`
+}
+
+func sensorLiveStatsPayload() string {
+	return `[
+  {
+    "status": "Active",
+    "sensor": {
+      "sensor_interface_name": "Interface 1",
+      "sensor_interface_id": "1",
+      "sensor_interface_color": "#439F0A",
+      "href": "/wanguard-api/v1/flow_sensors/1/interfaces/1"
+    },
+    "internal_ips": "1",
+    "external_ips": "0",
+    "packets/s_in": "100",
+    "packets/s_out": "100",
+    "bits/s_in": "1000",
+    "bits/s_out": "1000",
+    "dropped_in": "0",
+    "dropped_out": "0",
+    "usage_in": "1",
+    "usage_out": "1",
+    "load": "0.00",
+    "cpu%": "0.00",
+    "ram": 128,
+    "start_time": {
+      "iso_8601": "2024-10-28 00:00:01",
+      "unixtime": "1730107187"
+    },
+    "server": {
+      "server_id": "1",
+      "server_name": "Server 1",
+      "href": "/wanguard-api/v1/servers/1"
+    }
   }
 ]`
 }
