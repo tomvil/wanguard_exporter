@@ -120,6 +120,36 @@ func TestMain(m *testing.M) {
 		}
 	})
 
+	mux.HandleFunc("/wanguard-api/v1/sensor_live_tops", func(w http.ResponseWriter, r *http.Request) {
+		topType := r.URL.Query().Get("top_type")
+		unit := r.URL.Query().Get("unit")
+		direction := r.URL.Query().Get("direction")
+
+		if topType == "Countries" && (unit == "Packets" || unit == "Bits") && (direction == "Inbound" || direction == "Outbound") {
+			if _, err := w.Write([]byte(countriesTopPayload())); err != nil {
+				log.Errorln(err.Error())
+			}
+		}
+
+		if topType == "IP Versions" && (unit == "Packets" || unit == "Bits") && (direction == "Inbound" || direction == "Outbound") {
+			if _, err := w.Write([]byte(ipVersionsTopPayload())); err != nil {
+				log.Errorln(err.Error())
+			}
+		}
+
+		if topType == "IP Protocols" && (unit == "Packets" || unit == "Bits") && (direction == "Inbound" || direction == "Outbound") {
+			if _, err := w.Write([]byte(ipProtocolsTopPayload())); err != nil {
+				log.Errorln(err.Error())
+			}
+		}
+
+		if topType == "Talkers" && (unit == "Packets" || unit == "Bits") && (direction == "Inbound" || direction == "Outbound") {
+			if _, err := w.Write([]byte(talkersTopPayload())); err != nil {
+				log.Errorln(err.Error())
+			}
+		}
+	})
+
 	server := httptest.NewServer(mux)
 	defer server.Close()
 
@@ -298,4 +328,55 @@ func sensorLiveStatsPayload() string {
     }
   }
 ]`
+}
+
+func countriesTopPayload() string {
+	return `{
+  "top": {
+    "1": {
+      "country": "United States",
+      "value": 200,
+      "percent": 10
+    }
+  }
+}`
+}
+
+func ipVersionsTopPayload() string {
+	return `{
+  "top": {
+    "1": {
+      "ip_version": 4,
+      "description": "IPv4",
+      "value": 100,
+      "percent": 50
+    }
+  }
+}`
+}
+
+func ipProtocolsTopPayload() string {
+	return `{
+  "top": {
+    "1": {
+      "ip_protocol": 6,
+      "description": "Transmission Control",
+      "value": 100,
+      "percent": 50
+    }
+  }
+}`
+}
+
+func talkersTopPayload() string {
+	return `{
+  "top": {
+    "1": {
+      "ip_address": "10.10.10.10",
+      "ip_group_name": "External Zone",
+      "value": 100,
+      "percent": 10
+    }
+  }
+}`
 }
