@@ -96,6 +96,24 @@ func TestMain(m *testing.M) {
 		}
 	})
 
+	mux.HandleFunc("/wanguard-api/v1/responses", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := w.Write([]byte(responsesPayload())); err != nil {
+			log.Errorln(err.Error())
+		}
+	})
+
+	mux.HandleFunc("/wanguard-api/v1/responses/1/actions", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := w.Write([]byte(actionsPayload())); err != nil {
+			log.Errorln(err.Error())
+		}
+	})
+
+	mux.HandleFunc("/wanguard-api/v1/responses/1/actions/1/status", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := w.Write([]byte(`{"status": "Active"}`)); err != nil {
+			log.Errorln(err.Error())
+		}
+	})
+
 	server := httptest.NewServer(mux)
 	defer server.Close()
 
@@ -211,6 +229,31 @@ func anomaliesPayload() string {
     "packets": "320020500",
     "bits": "169576384000",
     "href": "/wanguard-api/v1/anomalies/1"
+  }
+]`
+}
+
+func responsesPayload() string {
+	return `[
+  {
+    "response_id": "1",
+    "response_name": "Response 1",
+    "href": "/wanguard-api/v1/responses/1"
+  }
+]`
+}
+
+func actionsPayload() string {
+	return `[
+  {
+    "action_id": "1",
+    "status": {
+      "href": "/wanguard-api/v1/responses/1/actions/1/status"
+    },
+    "action_name": "Action 1",
+    "action_type": "Send a custom Syslog message",
+    "response_branch": "When an anomaly is detected",
+    "href": "/wanguard-api/v1/responses/1/actions/1"
   }
 ]`
 }
