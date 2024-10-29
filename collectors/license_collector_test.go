@@ -30,8 +30,8 @@ func TestLicenseCollector(t *testing.T) {
 		"wanguard_license_filters",
 		"wanguard_license_filters_used",
 		"wanguard_license_filters_remaining",
-		"wanguard_license_days_remaining",
-		"wanguard_license_support_days_remaining")
+		"wanguard_license_seconds_remaining",
+		"wanguard_license_support_seconds_remaining")
 	if err != nil {
 		t.Errorf("Expected no error, got %s", err)
 	}
@@ -63,9 +63,9 @@ func licenseManagerExpectedMetrics() string {
 	# TYPE wanguard_license_filters_used gauge
 	wanguard_license_filters_used 1
 
-	# HELP wanguard_license_days_remaining License days remaining
-	# TYPE wanguard_license_days_remaining gauge
-	wanguard_license_days_remaining 365
+	# HELP wanguard_license_seconds_remaining License seconds remaining
+	# TYPE wanguard_license_seconds_remaining gauge
+	wanguard_license_seconds_remaining 86400
 
 	# HELP wanguard_license_sensors_total Licensed sensors total
 	# TYPE wanguard_license_sensors_total gauge
@@ -83,8 +83,8 @@ func licenseManagerExpectedMetrics() string {
 	# TYPE wanguard_license_software_version gauge
 	wanguard_license_software_version{software_version="8.3-21"} 1
 
-	# HELP wanguard_license_support_days_remaining Support license days remaining
-	# TYPE wanguard_license_support_days_remaining gauge
-	wanguard_license_support_days_remaining 365
+	# HELP wanguard_license_support_seconds_remaining Support license seconds remaining
+	# TYPE wanguard_license_support_seconds_remaining gauge
+	wanguard_license_support_seconds_remaining 86400
 `
 }

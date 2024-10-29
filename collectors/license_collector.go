@@ -10,19 +10,19 @@ import (
 )
 
 type LicenseCollector struct {
-	wgClient                     *wgc.Client
-	SoftwareVersion              *prometheus.Desc
-	LicensedSensors              *prometheus.Desc
-	LicensedSensorsUsed          *prometheus.Desc
-	LicensedSensorsRemaining     *prometheus.Desc
-	LicensedDpdkEngines          *prometheus.Desc
-	LicensedDpdkEnginesUsed      *prometheus.Desc
-	LicensedDpdkEnginesRemaining *prometheus.Desc
-	LicensedFilters              *prometheus.Desc
-	LicensedFiltersUsed          *prometheus.Desc
-	LicensedFiltersRemaining     *prometheus.Desc
-	LicenseDaysRemaining         *prometheus.Desc
-	LicenseSupportDaysRemaining  *prometheus.Desc
+	wgClient                       *wgc.Client
+	SoftwareVersion                *prometheus.Desc
+	LicensedSensors                *prometheus.Desc
+	LicensedSensorsUsed            *prometheus.Desc
+	LicensedSensorsRemaining       *prometheus.Desc
+	LicensedDpdkEngines            *prometheus.Desc
+	LicensedDpdkEnginesUsed        *prometheus.Desc
+	LicensedDpdkEnginesRemaining   *prometheus.Desc
+	LicensedFilters                *prometheus.Desc
+	LicensedFiltersUsed            *prometheus.Desc
+	LicensedFiltersRemaining       *prometheus.Desc
+	LicenseSecondsRemaining        *prometheus.Desc
+	LicenseSupportSecondsRemaining *prometheus.Desc
 }
 
 type License struct {
@@ -43,19 +43,19 @@ type License struct {
 func NewLicenseCollector(wgclient *wgc.Client) *LicenseCollector {
 	prefix := "wanguard_license_"
 	return &LicenseCollector{
-		wgClient:                     wgclient,
-		SoftwareVersion:              prometheus.NewDesc(prefix+"software_version", "Software version", []string{"software_version"}, nil),
-		LicensedSensors:              prometheus.NewDesc(prefix+"sensors_total", "Licensed sensors total", nil, nil),
-		LicensedSensorsUsed:          prometheus.NewDesc(prefix+"sensors_used", "Licensed sensors used", nil, nil),
-		LicensedSensorsRemaining:     prometheus.NewDesc(prefix+"sensors_remaining", "Licensed sensors remaining", nil, nil),
-		LicensedDpdkEngines:          prometheus.NewDesc(prefix+"dpdk_engines_total", "Licensed DPDK engines total", nil, nil),
-		LicensedDpdkEnginesUsed:      prometheus.NewDesc(prefix+"dpdk_engines_used", "Licensed DPDK engines used", nil, nil),
-		LicensedDpdkEnginesRemaining: prometheus.NewDesc(prefix+"dpdk_engines_remaining", "Licensed DPDK engines remaining", nil, nil),
-		LicensedFilters:              prometheus.NewDesc(prefix+"filters", "Licensed filters total", nil, nil),
-		LicensedFiltersUsed:          prometheus.NewDesc(prefix+"filters_used", "Licensed filters total", nil, nil),
-		LicensedFiltersRemaining:     prometheus.NewDesc(prefix+"filters_remaining", "Licensed filters available", nil, nil),
-		LicenseDaysRemaining:         prometheus.NewDesc(prefix+"days_remaining", "License days remaining", nil, nil),
-		LicenseSupportDaysRemaining:  prometheus.NewDesc(prefix+"support_days_remaining", "Support license days remaining", nil, nil),
+		wgClient:                       wgclient,
+		SoftwareVersion:                prometheus.NewDesc(prefix+"software_version", "Software version", []string{"software_version"}, nil),
+		LicensedSensors:                prometheus.NewDesc(prefix+"sensors_total", "Licensed sensors total", nil, nil),
+		LicensedSensorsUsed:            prometheus.NewDesc(prefix+"sensors_used", "Licensed sensors used", nil, nil),
+		LicensedSensorsRemaining:       prometheus.NewDesc(prefix+"sensors_remaining", "Licensed sensors remaining", nil, nil),
+		LicensedDpdkEngines:            prometheus.NewDesc(prefix+"dpdk_engines_total", "Licensed DPDK engines total", nil, nil),
+		LicensedDpdkEnginesUsed:        prometheus.NewDesc(prefix+"dpdk_engines_used", "Licensed DPDK engines used", nil, nil),
+		LicensedDpdkEnginesRemaining:   prometheus.NewDesc(prefix+"dpdk_engines_remaining", "Licensed DPDK engines remaining", nil, nil),
+		LicensedFilters:                prometheus.NewDesc(prefix+"filters", "Licensed filters total", nil, nil),
+		LicensedFiltersUsed:            prometheus.NewDesc(prefix+"filters_used", "Licensed filters total", nil, nil),
+		LicensedFiltersRemaining:       prometheus.NewDesc(prefix+"filters_remaining", "Licensed filters available", nil, nil),
+		LicenseSecondsRemaining:        prometheus.NewDesc(prefix+"seconds_remaining", "License seconds remaining", nil, nil),
+		LicenseSupportSecondsRemaining: prometheus.NewDesc(prefix+"support_seconds_remaining", "Support license seconds remaining", nil, nil),
 	}
 }
 
@@ -70,8 +70,8 @@ func (c *LicenseCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- c.LicensedFilters
 	ch <- c.LicensedFiltersUsed
 	ch <- c.LicensedFiltersRemaining
-	ch <- c.LicenseDaysRemaining
-	ch <- c.LicenseSupportDaysRemaining
+	ch <- c.LicenseSecondsRemaining
+	ch <- c.LicenseSupportSecondsRemaining
 }
 
 func (c *LicenseCollector) Collect(ch chan<- prometheus.Metric) {
@@ -97,8 +97,8 @@ func (c *LicenseCollector) Collect(ch chan<- prometheus.Metric) {
 	ch <- prometheus.MustNewConstMetric(c.LicensedFilters, prometheus.GaugeValue, getFloat64(license.LicensedFilters))
 	ch <- prometheus.MustNewConstMetric(c.LicensedFiltersUsed, prometheus.GaugeValue, getFloat64(license.LicensedFiltersUsed))
 	ch <- prometheus.MustNewConstMetric(c.LicensedFiltersRemaining, prometheus.GaugeValue, getFloat64(license.LicensedFiltersRemaining))
-	ch <- prometheus.MustNewConstMetric(c.LicenseDaysRemaining, prometheus.GaugeValue, getFloat64(license.LicenseDaysRemaining))
-	ch <- prometheus.MustNewConstMetric(c.LicenseSupportDaysRemaining, prometheus.GaugeValue, getFloat64(license.LicenseSupportDaysRemaining))
+	ch <- prometheus.MustNewConstMetric(c.LicenseSecondsRemaining, prometheus.GaugeValue, toSeconds(getFloat64(license.LicenseDaysRemaining)))
+	ch <- prometheus.MustNewConstMetric(c.LicenseSupportSecondsRemaining, prometheus.GaugeValue, toSeconds(getFloat64(license.LicenseSupportDaysRemaining)))
 }
 
 func getFloat64(v interface{}) float64 {
@@ -125,4 +125,8 @@ func getFloat64(v interface{}) float64 {
 		log.Errorf("conversion to float64 from %T is not supported", v)
 		return 0
 	}
+}
+
+func toSeconds(days float64) float64 {
+	return days * 86400
 }

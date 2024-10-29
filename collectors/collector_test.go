@@ -174,8 +174,8 @@ func licenseManagerPayload() string {
   "licensed_filters_used": 1,
   "licensed_filters_remaining": 0,
   "licensed_on": "2024-10-24 12:15:29",
-  "license_expiry_date_remaining": "365 days",
-  "support_expiry_date_remaining": "365 days"
+  "license_expiry_date_remaining": "1 days",
+  "support_expiry_date_remaining": "1 days"
 }`
 }
 
