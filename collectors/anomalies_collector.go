@@ -9,9 +9,9 @@ import (
 )
 
 type AnomaliesCollector struct {
-	wgClient               *wgc.Client
-	AnomalyActive          *prometheus.Desc
-	AnomaliesFinishedCount *prometheus.Desc
+	wgClient          *wgc.Client
+	AnomalyActive     *prometheus.Desc
+	AnomaliesFinished *prometheus.Desc
 }
 
 type AnomaliesCount struct {
@@ -31,20 +31,20 @@ type Anomaly struct {
 func NewAnomaliesCollector(wgclient *wgc.Client) *AnomaliesCollector {
 	prefix := "wanguard_anomalies_"
 	return &AnomaliesCollector{
-		wgClient:               wgclient,
-		AnomalyActive:          prometheus.NewDesc(prefix+"active", "Active anomalies at the moment", []string{"prefix", "anomaly", "duration", "pkts_s", "packets", "bits_s", "bits"}, nil),
-		AnomaliesFinishedCount: prometheus.NewDesc(prefix+"count", "Count of anomalies", nil, nil),
+		wgClient:          wgclient,
+		AnomalyActive:     prometheus.NewDesc(prefix+"active", "Active anomalies at the moment", []string{"prefix", "anomaly", "duration", "pkts_s", "packets", "bits_s", "bits"}, nil),
+		AnomaliesFinished: prometheus.NewDesc(prefix+"finished", "Number of finished anomalies", nil, nil),
 	}
 }
 
 func (c *AnomaliesCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- c.AnomalyActive
-	ch <- c.AnomaliesFinishedCount
+	ch <- c.AnomaliesFinished
 }
 
 func (c *AnomaliesCollector) Collect(ch chan<- prometheus.Metric) {
 	collectActiveAnomalies(c.AnomalyActive, c.wgClient, ch)
-	collectFinishedAnomaliesTotal(c.AnomaliesFinishedCount, c.wgClient, ch)
+	collectFinishedAnomaliesTotal(c.AnomaliesFinished, c.wgClient, ch)
 }
 
 func collectActiveAnomalies(desc *prometheus.Desc, wgclient *wgc.Client, ch chan<- prometheus.Metric) {

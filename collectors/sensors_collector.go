@@ -1,8 +1,6 @@
 package collectors
 
 import (
-	"strconv"
-
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/log"
 	wgc "github.com/tomvil/wanguard_exporter/client"
@@ -53,8 +51,8 @@ func NewSensorsCollector(wgclient *wgc.Client) *SensorsCollector {
 		SensorExternalIPS: prometheus.NewDesc(prefix+"external_ips", "Total number of external ip addresses", []string{"sensor_name", "sensor_id"}, nil),
 		SensorPPSIn:       prometheus.NewDesc(prefix+"packets_per_second_in", "Incoming packets per second", []string{"sensor_name", "sensor_id"}, nil),
 		SensorPPSOut:      prometheus.NewDesc(prefix+"packets_per_second_out", "Incoming packets per second", []string{"sensor_name", "sensor_id"}, nil),
-		SensorBPSIn:       prometheus.NewDesc(prefix+"bits_per_second_in", "Incoming bits per second", []string{"sensor_name", "sensor_id"}, nil),
-		SensorBPSOut:      prometheus.NewDesc(prefix+"bits_per_second_out", "Outgoing bits per second", []string{"sensor_name", "sensor_id"}, nil),
+		SensorBPSIn:       prometheus.NewDesc(prefix+"bytes_per_second_in", "Incoming bytes per second", []string{"sensor_name", "sensor_id"}, nil),
+		SensorBPSOut:      prometheus.NewDesc(prefix+"bytes_per_second_out", "Outgoing bytes per second", []string{"sensor_name", "sensor_id"}, nil),
 		SensorDroppedIn:   prometheus.NewDesc(prefix+"dropped_in", "Total number of dropped packets in", []string{"sensor_name", "sensor_id"}, nil),
 		SensorDroppedOut:  prometheus.NewDesc(prefix+"dropped_out", "Total number of dropped packets out", []string{"sensor_name", "sensor_id"}, nil),
 		SensorUsageIn:     prometheus.NewDesc(prefix+"usage_in", "Interface incoming traffic usage", []string{"sensor_name", "sensor_id"}, nil),
@@ -94,8 +92,8 @@ func (c *SensorsCollector) Collect(ch chan<- prometheus.Metric) {
 		ch <- prometheus.MustNewConstMetric(c.SensorExternalIPS, prometheus.GaugeValue, stringToFloat64(s.ExternalIPS), s.Sensor.InterfaceName, s.Sensor.InterfaceID)
 		ch <- prometheus.MustNewConstMetric(c.SensorPPSIn, prometheus.GaugeValue, stringToFloat64(s.PacketsPerSecondIN), s.Sensor.InterfaceName, s.Sensor.InterfaceID)
 		ch <- prometheus.MustNewConstMetric(c.SensorPPSOut, prometheus.GaugeValue, stringToFloat64(s.PacketsPerSecondOUT), s.Sensor.InterfaceName, s.Sensor.InterfaceID)
-		ch <- prometheus.MustNewConstMetric(c.SensorBPSIn, prometheus.GaugeValue, stringToFloat64(s.BitsPerSecondIN), s.Sensor.InterfaceName, s.Sensor.InterfaceID)
-		ch <- prometheus.MustNewConstMetric(c.SensorBPSOut, prometheus.GaugeValue, stringToFloat64(s.BitsPerSecondOUT), s.Sensor.InterfaceName, s.Sensor.InterfaceID)
+		ch <- prometheus.MustNewConstMetric(c.SensorBPSIn, prometheus.GaugeValue, bitsToBytes(stringToFloat64(s.BitsPerSecondIN)), s.Sensor.InterfaceName, s.Sensor.InterfaceID)
+		ch <- prometheus.MustNewConstMetric(c.SensorBPSOut, prometheus.GaugeValue, bitsToBytes(stringToFloat64(s.BitsPerSecondOUT)), s.Sensor.InterfaceName, s.Sensor.InterfaceID)
 		ch <- prometheus.MustNewConstMetric(c.SensorDroppedIn, prometheus.GaugeValue, stringToFloat64(s.DroppedIN), s.Sensor.InterfaceName, s.Sensor.InterfaceID)
 		ch <- prometheus.MustNewConstMetric(c.SensorDroppedOut, prometheus.GaugeValue, stringToFloat64(s.DroppedOUT), s.Sensor.InterfaceName, s.Sensor.InterfaceID)
 		ch <- prometheus.MustNewConstMetric(c.SensorUsageIn, prometheus.GaugeValue, stringToFloat64(s.UsageIN), s.Sensor.InterfaceName, s.Sensor.InterfaceID)
@@ -104,13 +102,4 @@ func (c *SensorsCollector) Collect(ch chan<- prometheus.Metric) {
 		ch <- prometheus.MustNewConstMetric(c.SensorCpu, prometheus.GaugeValue, stringToFloat64(s.Cpu), s.Sensor.InterfaceName, s.Sensor.InterfaceID)
 		ch <- prometheus.MustNewConstMetric(c.SensorRam, prometheus.GaugeValue, float64(s.Ram), s.Sensor.InterfaceName, s.Sensor.InterfaceID)
 	}
-}
-
-func stringToFloat64(v string) float64 {
-	f, err := strconv.ParseFloat(v, 64)
-	if err != nil {
-		return 0
-	}
-
-	return f
 }

@@ -18,8 +18,17 @@ func TestComponentsCollector(t *testing.T) {
 		t.Errorf("Expected 3 metric, got %d", metricsCount)
 	}
 
+	lintErrors, err := testutil.CollectAndLint(ComponentsCollector)
+	if err != nil {
+		t.Errorf("Expected no error, got %s", err)
+	}
+
+	for _, lintError := range lintErrors {
+		t.Errorf("metric %v has lint error: %v", lintError.Metric, lintError.Text)
+	}
+
 	expectedMetrics := componentsExpectedMetrics()
-	err := testutil.CollectAndCompare(ComponentsCollector, strings.NewReader(expectedMetrics),
+	err = testutil.CollectAndCompare(ComponentsCollector, strings.NewReader(expectedMetrics),
 		"wanguard_component_status")
 	if err != nil {
 		t.Errorf("Expected no error, got %s", err)
