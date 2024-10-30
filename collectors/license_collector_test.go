@@ -21,13 +21,13 @@ func TestLicenseCollector(t *testing.T) {
 	expectedMetrics := licenseManagerExpectedMetrics()
 	err := testutil.CollectAndCompare(licenseCollector, strings.NewReader(expectedMetrics),
 		"wanguard_license_software_version",
-		"wanguard_license_sensors_total",
+		"wanguard_license_sensors_count",
 		"wanguard_license_sensors_used",
 		"wanguard_license_sensors_remaining",
-		"wanguard_license_dpdk_engines_total",
+		"wanguard_license_dpdk_engines_count",
 		"wanguard_license_dpdk_engines_used",
 		"wanguard_license_dpdk_engines_remaining",
-		"wanguard_license_filters",
+		"wanguard_license_filters_count",
 		"wanguard_license_filters_used",
 		"wanguard_license_filters_remaining",
 		"wanguard_license_seconds_remaining",
@@ -39,9 +39,9 @@ func TestLicenseCollector(t *testing.T) {
 
 func licenseManagerExpectedMetrics() string {
 	return `
-	# HELP wanguard_license_dpdk_engines_total Licensed DPDK engines total
-	# TYPE wanguard_license_dpdk_engines_total gauge
-	wanguard_license_dpdk_engines_total 0
+	# HELP wanguard_license_dpdk_engines_count Licensed DPDK engines count
+	# TYPE wanguard_license_dpdk_engines_count gauge
+	wanguard_license_dpdk_engines_count 0
 
 	# HELP wanguard_license_dpdk_engines_remaining Licensed DPDK engines remaining
 	# TYPE wanguard_license_dpdk_engines_remaining gauge
@@ -51,15 +51,15 @@ func licenseManagerExpectedMetrics() string {
 	# TYPE wanguard_license_dpdk_engines_used gauge
 	wanguard_license_dpdk_engines_used 0
 
-	# HELP wanguard_license_filters Licensed filters total
-	# TYPE wanguard_license_filters gauge
-	wanguard_license_filters 1
+	# HELP wanguard_license_filters_count Licensed filters count
+	# TYPE wanguard_license_filters_count gauge
+	wanguard_license_filters_count 1
 
 	# HELP wanguard_license_filters_remaining Licensed filters available
 	# TYPE wanguard_license_filters_remaining gauge
 	wanguard_license_filters_remaining 0
 
-	# HELP wanguard_license_filters_used Licensed filters total
+	# HELP wanguard_license_filters_used Licensed filters used
 	# TYPE wanguard_license_filters_used gauge
 	wanguard_license_filters_used 1
 
@@ -67,9 +67,9 @@ func licenseManagerExpectedMetrics() string {
 	# TYPE wanguard_license_seconds_remaining gauge
 	wanguard_license_seconds_remaining 86400
 
-	# HELP wanguard_license_sensors_total Licensed sensors total
-	# TYPE wanguard_license_sensors_total gauge
-	wanguard_license_sensors_total 1
+	# HELP wanguard_license_sensors_count Licensed sensors count
+	# TYPE wanguard_license_sensors_count gauge
+	wanguard_license_sensors_count 1
 
 	# HELP wanguard_license_sensors_remaining Licensed sensors remaining
 	# TYPE wanguard_license_sensors_remaining gauge
