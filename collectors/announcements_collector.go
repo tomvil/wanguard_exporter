@@ -11,7 +11,7 @@ import (
 type AnnouncementsCollector struct {
 	wgClient                   *wgc.Client
 	AnnouncementActive         *prometheus.Desc
-	AnnouncementsFinishedTotal *prometheus.Desc
+	AnnouncementsFinishedCount *prometheus.Desc
 }
 
 type AnnouncementsCount struct {
@@ -30,18 +30,18 @@ func NewAnnouncementsCollector(wgclient *wgc.Client) *AnnouncementsCollector {
 	return &AnnouncementsCollector{
 		wgClient:                   wgclient,
 		AnnouncementActive:         prometheus.NewDesc(prefix+"active", "Active announcements at the moment", []string{"prefix", "from", "until", "announcement_id"}, nil),
-		AnnouncementsFinishedTotal: prometheus.NewDesc(prefix+"total", "Total amount of announcements", nil, nil),
+		AnnouncementsFinishedCount: prometheus.NewDesc(prefix+"count", "Total count of announcements", nil, nil),
 	}
 }
 
 func (c *AnnouncementsCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- c.AnnouncementActive
-	ch <- c.AnnouncementsFinishedTotal
+	ch <- c.AnnouncementsFinishedCount
 }
 
 func (c *AnnouncementsCollector) Collect(ch chan<- prometheus.Metric) {
 	collectActiveAnnouncements(c.AnnouncementActive, c.wgClient, ch)
-	collectFinishedAnnouncementsTotal(c.AnnouncementsFinishedTotal, c.wgClient, ch)
+	collectFinishedAnnouncementsTotal(c.AnnouncementsFinishedCount, c.wgClient, ch)
 }
 
 func collectActiveAnnouncements(desc *prometheus.Desc, wgclient *wgc.Client, ch chan<- prometheus.Metric) {

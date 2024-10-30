@@ -21,7 +21,7 @@ func TestAnnouncementsCollector(t *testing.T) {
 	expectedMetrics := announcementsExpectedMetrics()
 	err := testutil.CollectAndCompare(AnnouncementsCollector, strings.NewReader(expectedMetrics),
 		"wanguard_announcements_active",
-		"wanguard_announcements_total")
+		"wanguard_announcements_count")
 	if err != nil {
 		t.Errorf("Expected no error, got %s", err)
 	}
@@ -32,8 +32,8 @@ func announcementsExpectedMetrics() string {
 	# HELP wanguard_announcements_active Active announcements at the moment
 	# TYPE wanguard_announcements_active gauge
 	wanguard_announcements_active{announcement_id="1",from="2024-10-23 09:31:01",prefix="10.10.10.10/32",until=""} 1
-	# HELP wanguard_announcements_total Total amount of announcements
-	# TYPE wanguard_announcements_total gauge
-	wanguard_announcements_total 1
+	# HELP wanguard_announcements_count Total count of announcements
+	# TYPE wanguard_announcements_count gauge
+	wanguard_announcements_count 1
 `
 }
