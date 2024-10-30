@@ -21,7 +21,7 @@ func TestAnomaliesCollector(t *testing.T) {
 	expectedMetrics := anomaliesExpectedMetrics()
 	err := testutil.CollectAndCompare(AnomaliesCollector, strings.NewReader(expectedMetrics),
 		"wanguard_anomalies_active",
-		"wanguard_anomalies_total")
+		"wanguard_anomalies_count")
 	if err != nil {
 		t.Errorf("Expected no error, got %s", err)
 	}
@@ -33,8 +33,8 @@ func anomaliesExpectedMetrics() string {
 	# TYPE wanguard_anomalies_active gauge
 	wanguard_anomalies_active{anomaly="ICMP pkts/s > 1",bits="169576384000",bits_s="9014400",duration="60",packets="320020500",pkts_s="17500",prefix="10.10.10.10/32"} 1
 	
-	# HELP wanguard_anomalies_total Total amount of anomalies
-	# TYPE wanguard_anomalies_total gauge
-	wanguard_anomalies_total 1
+	# HELP wanguard_anomalies_count Count of anomalies
+	# TYPE wanguard_anomalies_count gauge
+	wanguard_anomalies_count 1
 `
 }
