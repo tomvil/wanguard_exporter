@@ -1,9 +1,6 @@
 package collectors
 
 import (
-	"strconv"
-	"strings"
-
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/log"
 	wgc "github.com/tomvil/wanguard_exporter/client"
@@ -45,15 +42,15 @@ func NewLicenseCollector(wgclient *wgc.Client) *LicenseCollector {
 	return &LicenseCollector{
 		wgClient:                       wgclient,
 		SoftwareVersion:                prometheus.NewDesc(prefix+"software_version", "Software version", []string{"software_version"}, nil),
-		LicensedSensors:                prometheus.NewDesc(prefix+"sensors_count", "Licensed sensors count", nil, nil),
+		LicensedSensors:                prometheus.NewDesc(prefix+"sensors_available", "Licensed sensors available", nil, nil),
 		LicensedSensorsUsed:            prometheus.NewDesc(prefix+"sensors_used", "Licensed sensors used", nil, nil),
 		LicensedSensorsRemaining:       prometheus.NewDesc(prefix+"sensors_remaining", "Licensed sensors remaining", nil, nil),
-		LicensedDpdkEngines:            prometheus.NewDesc(prefix+"dpdk_engines_count", "Licensed DPDK engines count", nil, nil),
+		LicensedDpdkEngines:            prometheus.NewDesc(prefix+"dpdk_engines_available", "Licensed DPDK engines available", nil, nil),
 		LicensedDpdkEnginesUsed:        prometheus.NewDesc(prefix+"dpdk_engines_used", "Licensed DPDK engines used", nil, nil),
 		LicensedDpdkEnginesRemaining:   prometheus.NewDesc(prefix+"dpdk_engines_remaining", "Licensed DPDK engines remaining", nil, nil),
-		LicensedFilters:                prometheus.NewDesc(prefix+"filters_count", "Licensed filters count", nil, nil),
+		LicensedFilters:                prometheus.NewDesc(prefix+"filters_available", "Licensed filters available", nil, nil),
 		LicensedFiltersUsed:            prometheus.NewDesc(prefix+"filters_used", "Licensed filters used", nil, nil),
-		LicensedFiltersRemaining:       prometheus.NewDesc(prefix+"filters_remaining", "Licensed filters available", nil, nil),
+		LicensedFiltersRemaining:       prometheus.NewDesc(prefix+"filters_remaining", "Licensed filters remaining", nil, nil),
 		LicenseSecondsRemaining:        prometheus.NewDesc(prefix+"seconds_remaining", "License seconds remaining", nil, nil),
 		LicenseSupportSecondsRemaining: prometheus.NewDesc(prefix+"support_seconds_remaining", "Support license seconds remaining", nil, nil),
 	}
@@ -99,34 +96,4 @@ func (c *LicenseCollector) Collect(ch chan<- prometheus.Metric) {
 	ch <- prometheus.MustNewConstMetric(c.LicensedFiltersRemaining, prometheus.GaugeValue, getFloat64(license.LicensedFiltersRemaining))
 	ch <- prometheus.MustNewConstMetric(c.LicenseSecondsRemaining, prometheus.GaugeValue, toSeconds(getFloat64(license.LicenseDaysRemaining)))
 	ch <- prometheus.MustNewConstMetric(c.LicenseSupportSecondsRemaining, prometheus.GaugeValue, toSeconds(getFloat64(license.LicenseSupportDaysRemaining)))
-}
-
-func getFloat64(v interface{}) float64 {
-	switch v := v.(type) {
-	case float64:
-		return v
-	case int:
-		return float64(v)
-	case nil:
-		return 0
-	case string:
-		r := strings.NewReplacer(
-			" days", "",
-			"∞", "9999")
-
-		result, err := strconv.ParseFloat(r.Replace(v), 64)
-		if err != nil {
-			log.Errorf("was not able to parse %T to float64!", v)
-			return 0
-		}
-
-		return float64(result)
-	default:
-		log.Errorf("conversion to float64 from %T is not supported", v)
-		return 0
-	}
-}
-
-func toSeconds(days float64) float64 {
-	return days * 86400
 }

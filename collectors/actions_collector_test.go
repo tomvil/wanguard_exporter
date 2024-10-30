@@ -18,8 +18,17 @@ func TestActionsCollector(t *testing.T) {
 		t.Errorf("Expected 1 metric, got %d", metricsCount)
 	}
 
+	lintErrors, err := testutil.CollectAndLint(ActionsCollector)
+	if err != nil {
+		t.Errorf("Expected no error, got %s", err)
+	}
+
+	for _, lintError := range lintErrors {
+		t.Errorf("metric %v has lint error: %v", lintError.Metric, lintError.Text)
+	}
+
 	expectedMetrics := actionsExpectedMetrics()
-	err := testutil.CollectAndCompare(ActionsCollector, strings.NewReader(expectedMetrics),
+	err = testutil.CollectAndCompare(ActionsCollector, strings.NewReader(expectedMetrics),
 		"wanguard_action_status")
 	if err != nil {
 		t.Errorf("Expected no error, got %s", err)

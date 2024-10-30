@@ -18,14 +18,23 @@ func TestSensorsCollector(t *testing.T) {
 		t.Errorf("Expected 13 metrics, got %d", metricsCount)
 	}
 
+	lintErrors, err := testutil.CollectAndLint(SensorsCollector)
+	if err != nil {
+		t.Errorf("Expected no error, got %s", err)
+	}
+
+	for _, lintError := range lintErrors {
+		t.Errorf("metric %v has lint error: %v", lintError.Metric, lintError.Text)
+	}
+
 	expectedMetrics := sensorsExpectedMetrics()
-	err := testutil.CollectAndCompare(SensorsCollector, strings.NewReader(expectedMetrics),
+	err = testutil.CollectAndCompare(SensorsCollector, strings.NewReader(expectedMetrics),
 		"wanguard_sensor_internal_ips",
 		"wanguard_sensor_external_ips",
 		"wanguard_sensor_packets_per_second_in",
 		"wanguard_sensor_packets_per_second_out",
-		"wanguard_sensor_bits_per_second_in",
-		"wanguard_sensor_bits_per_second_out",
+		"wanguard_sensor_bytes_per_second_in",
+		"wanguard_sensor_bytes_per_second_out",
 		"wanguard_sensor_dropped_in",
 		"wanguard_sensor_dropped_out",
 		"wanguard_sensor_usage_in",
@@ -40,13 +49,13 @@ func TestSensorsCollector(t *testing.T) {
 
 func sensorsExpectedMetrics() string {
 	return `
-	# HELP wanguard_sensor_bits_per_second_in Incoming bits per second
-	# TYPE wanguard_sensor_bits_per_second_in gauge
-	wanguard_sensor_bits_per_second_in{sensor_id="1",sensor_name="Interface 1"} 1000
+	# HELP wanguard_sensor_bytes_per_second_in Incoming bytes per second
+	# TYPE wanguard_sensor_bytes_per_second_in gauge
+	wanguard_sensor_bytes_per_second_in{sensor_id="1",sensor_name="Interface 1"} 125
 
-	# HELP wanguard_sensor_bits_per_second_out Outgoing bits per second
-	# TYPE wanguard_sensor_bits_per_second_out gauge
-	wanguard_sensor_bits_per_second_out{sensor_id="1",sensor_name="Interface 1"} 1000
+	# HELP wanguard_sensor_bytes_per_second_out Outgoing bytes per second
+	# TYPE wanguard_sensor_bytes_per_second_out gauge
+	wanguard_sensor_bytes_per_second_out{sensor_id="1",sensor_name="Interface 1"} 125
 
 	# HELP wanguard_sensor_cpu Sensors CPU usage
 	# TYPE wanguard_sensor_cpu gauge

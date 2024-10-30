@@ -13,21 +13,30 @@ func TestLicenseCollector(t *testing.T) {
 	wgcClient := wgc.NewClient(os.Getenv("TEST_SERVER_URL"), "u", "p")
 	licenseCollector := NewLicenseCollector(wgcClient)
 
-	metricsCount := testutil.CollectAndCount(licenseCollector)
-	if metricsCount != 12 {
-		t.Errorf("Expected 12 metrics, got %d", metricsCount)
+	metricsavailable := testutil.CollectAndCount(licenseCollector)
+	if metricsavailable != 12 {
+		t.Errorf("Expected 12 metrics, got %d", metricsavailable)
+	}
+
+	lintErrors, err := testutil.CollectAndLint(licenseCollector)
+	if err != nil {
+		t.Errorf("Expected no error, got %s", err)
+	}
+
+	for _, lintError := range lintErrors {
+		t.Errorf("metric %v has lint error: %v", lintError.Metric, lintError.Text)
 	}
 
 	expectedMetrics := licenseManagerExpectedMetrics()
-	err := testutil.CollectAndCompare(licenseCollector, strings.NewReader(expectedMetrics),
+	err = testutil.CollectAndCompare(licenseCollector, strings.NewReader(expectedMetrics),
 		"wanguard_license_software_version",
-		"wanguard_license_sensors_count",
+		"wanguard_license_sensors_available",
 		"wanguard_license_sensors_used",
 		"wanguard_license_sensors_remaining",
-		"wanguard_license_dpdk_engines_count",
+		"wanguard_license_dpdk_engines_available",
 		"wanguard_license_dpdk_engines_used",
 		"wanguard_license_dpdk_engines_remaining",
-		"wanguard_license_filters_count",
+		"wanguard_license_filters_available",
 		"wanguard_license_filters_used",
 		"wanguard_license_filters_remaining",
 		"wanguard_license_seconds_remaining",
@@ -39,9 +48,9 @@ func TestLicenseCollector(t *testing.T) {
 
 func licenseManagerExpectedMetrics() string {
 	return `
-	# HELP wanguard_license_dpdk_engines_count Licensed DPDK engines count
-	# TYPE wanguard_license_dpdk_engines_count gauge
-	wanguard_license_dpdk_engines_count 0
+	# HELP wanguard_license_dpdk_engines_available Licensed DPDK engines available
+	# TYPE wanguard_license_dpdk_engines_available gauge
+	wanguard_license_dpdk_engines_available 0
 
 	# HELP wanguard_license_dpdk_engines_remaining Licensed DPDK engines remaining
 	# TYPE wanguard_license_dpdk_engines_remaining gauge
@@ -51,11 +60,11 @@ func licenseManagerExpectedMetrics() string {
 	# TYPE wanguard_license_dpdk_engines_used gauge
 	wanguard_license_dpdk_engines_used 0
 
-	# HELP wanguard_license_filters_count Licensed filters count
-	# TYPE wanguard_license_filters_count gauge
-	wanguard_license_filters_count 1
+	# HELP wanguard_license_filters_available Licensed filters available
+	# TYPE wanguard_license_filters_available gauge
+	wanguard_license_filters_available 1
 
-	# HELP wanguard_license_filters_remaining Licensed filters available
+	# HELP wanguard_license_filters_remaining Licensed filters remaining
 	# TYPE wanguard_license_filters_remaining gauge
 	wanguard_license_filters_remaining 0
 
@@ -67,9 +76,9 @@ func licenseManagerExpectedMetrics() string {
 	# TYPE wanguard_license_seconds_remaining gauge
 	wanguard_license_seconds_remaining 86400
 
-	# HELP wanguard_license_sensors_count Licensed sensors count
-	# TYPE wanguard_license_sensors_count gauge
-	wanguard_license_sensors_count 1
+	# HELP wanguard_license_sensors_available Licensed sensors available
+	# TYPE wanguard_license_sensors_available gauge
+	wanguard_license_sensors_available 1
 
 	# HELP wanguard_license_sensors_remaining Licensed sensors remaining
 	# TYPE wanguard_license_sensors_remaining gauge
