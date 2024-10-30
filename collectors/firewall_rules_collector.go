@@ -11,7 +11,7 @@ import (
 type FirewallRulesCollector struct {
 	wgClient           *wgc.Client
 	FirewallRuleActive *prometheus.Desc
-	FirewallRulesTotal *prometheus.Desc
+	FirewallRulesCount *prometheus.Desc
 }
 
 type FirewallRulesCount struct {
@@ -52,18 +52,18 @@ func NewFirewallRulesCollector(wgclient *wgc.Client) *FirewallRulesCollector {
 				"max_bits_s",
 				"pkts",
 				"bits"}, nil),
-		FirewallRulesTotal: prometheus.NewDesc(prefix+"total", "Total amount of active firewall rules", nil, nil),
+		FirewallRulesCount: prometheus.NewDesc(prefix+"count", "Count of active firewall rules", nil, nil),
 	}
 }
 
 func (c *FirewallRulesCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- c.FirewallRuleActive
-	ch <- c.FirewallRulesTotal
+	ch <- c.FirewallRulesCount
 }
 
 func (c *FirewallRulesCollector) Collect(ch chan<- prometheus.Metric) {
 	collectFirewallRules(c.FirewallRuleActive, c.wgClient, ch)
-	collectFirewallRulesTotal(c.FirewallRulesTotal, c.wgClient, ch)
+	collectFirewallRulesCount(c.FirewallRulesCount, c.wgClient, ch)
 }
 
 func collectFirewallRules(desc *prometheus.Desc, wgclient *wgc.Client, ch chan<- prometheus.Metric) {
@@ -95,7 +95,7 @@ func collectFirewallRules(desc *prometheus.Desc, wgclient *wgc.Client, ch chan<-
 	}
 }
 
-func collectFirewallRulesTotal(desc *prometheus.Desc, wgclient *wgc.Client, ch chan<- prometheus.Metric) {
+func collectFirewallRulesCount(desc *prometheus.Desc, wgclient *wgc.Client, ch chan<- prometheus.Metric) {
 	var firewallRulesCount FirewallRulesCount
 
 	err := wgclient.GetParsed("firewall_rules?count=true", &firewallRulesCount)
