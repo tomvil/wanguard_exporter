@@ -257,6 +257,7 @@ func announcementsPayload() string {
 func anomaliesPayload() string {
 	return `[
   {
+    "anomaly_id": "1",
     "prefix": "10.10.10.10/32",
     "anomaly": "ICMP pkts/s > 1",
     "duration": "60",
