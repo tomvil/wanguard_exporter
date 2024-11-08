@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	version string = "1.4"
+	version string = "1.5"
 )
 
 type collectorsList struct {
@@ -97,7 +97,7 @@ func startServer() {
 	})
 	http.HandleFunc(*metricsPath, handleMetricsRequest)
 
-	log.Infof("Listening for %s on %s\n", *metricsPath, *listenAddr)
+	log.Infof("Listening for %s on %s", *metricsPath, *listenAddr)
 	log.Fatal(http.ListenAndServe(*listenAddr, nil))
 }
 
