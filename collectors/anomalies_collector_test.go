@@ -40,7 +40,7 @@ func anomaliesExpectedMetrics() string {
 	return `
 	# HELP wanguard_anomalies_active Active anomalies at the moment
 	# TYPE wanguard_anomalies_active gauge
-	wanguard_anomalies_active{anomaly="ICMP pkts/s > 1",bits="169576384000",bits_s="9014400",duration="60",packets="320020500",pkts_s="17500",prefix="10.10.10.10/32"} 1
+	wanguard_anomalies_active{anomaly="ICMP pkts/s > 1",anomaly_id="1",bits="169576384000",bits_s="9014400",duration="60",packets="320020500",pkts_s="17500",prefix="10.10.10.10/32"} 1
 	
 	# HELP wanguard_anomalies_finished Number of finished anomalies
 	# TYPE wanguard_anomalies_finished gauge

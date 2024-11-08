@@ -19,20 +19,21 @@ type AnomaliesCount struct {
 }
 
 type Anomaly struct {
-	Prefix   string
-	Anomaly  string
-	Duration string
-	Pkts_s   string `json:"pkts/s"`
-	Bits_s   string `json:"bits/s"`
-	Packets  string
-	Bits     string
+	AnomalyId string `json:"anomaly_id"`
+	Prefix    string
+	Anomaly   string
+	Duration  string
+	Pkts_s    string `json:"pkts/s"`
+	Bits_s    string `json:"bits/s"`
+	Packets   string
+	Bits      string
 }
 
 func NewAnomaliesCollector(wgclient *wgc.Client) *AnomaliesCollector {
 	prefix := "wanguard_anomalies_"
 	return &AnomaliesCollector{
 		wgClient:          wgclient,
-		AnomalyActive:     prometheus.NewDesc(prefix+"active", "Active anomalies at the moment", []string{"prefix", "anomaly", "duration", "pkts_s", "packets", "bits_s", "bits"}, nil),
+		AnomalyActive:     prometheus.NewDesc(prefix+"active", "Active anomalies at the moment", []string{"prefix", "anomaly", "anomaly_id", "duration", "pkts_s", "packets", "bits_s", "bits"}, nil),
 		AnomaliesFinished: prometheus.NewDesc(prefix+"finished", "Number of finished anomalies", nil, nil),
 	}
 }
@@ -50,7 +51,7 @@ func (c *AnomaliesCollector) Collect(ch chan<- prometheus.Metric) {
 func collectActiveAnomalies(desc *prometheus.Desc, wgclient *wgc.Client, ch chan<- prometheus.Metric) {
 	var anomalies []Anomaly
 
-	err := wgclient.GetParsed("anomalies?status=Active&fields=anomaly,prefix,duration,pkts/s,packets,bits/s,bits", &anomalies)
+	err := wgclient.GetParsed("anomalies?status=Active&fields=anomaly_id,anomaly,prefix,duration,pkts/s,packets,bits/s,bits", &anomalies)
 	if err != nil {
 		return
 	}
@@ -59,6 +60,7 @@ func collectActiveAnomalies(desc *prometheus.Desc, wgclient *wgc.Client, ch chan
 		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, 1,
 			anomaly.Prefix,
 			anomaly.Anomaly,
+			anomaly.AnomalyId,
 			anomaly.Duration,
 			anomaly.Pkts_s,
 			anomaly.Packets,
