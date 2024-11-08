@@ -40,7 +40,7 @@ func announcementsExpectedMetrics() string {
 	return `
 	# HELP wanguard_announcements_active Active announcements at the moment
 	# TYPE wanguard_announcements_active gauge
-	wanguard_announcements_active{announcement_id="1",from="2024-10-23 09:31:01",prefix="10.10.10.10/32",until=""} 1
+	wanguard_announcements_active{announcement_id="1",bgp_connector_name="Connector 1",from="2024-10-23 09:31:01",prefix="10.10.10.10/32",until=""} 1
 	# HELP wanguard_announcements_finished Total amount of finished announcements
 	# TYPE wanguard_announcements_finished gauge
 	wanguard_announcements_finished 1

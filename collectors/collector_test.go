@@ -240,6 +240,11 @@ func announcementsPayload() string {
 	return `[
   {
     "bgp_announcement_id": "1",
+    "bgp_connector": {
+      "bgp_connector_id": "1",
+      "bgp_connector_name": "Connector 1",
+      "href": "/wanguard-api/v1/bgp_connectors/1"
+    },
     "prefix": "10.10.10.10/32",
     "from": {
       "iso_8601": "2024-10-23 09:31:01",

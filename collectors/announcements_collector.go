@@ -19,17 +19,22 @@ type AnnouncementsCount struct {
 }
 
 type Announcement struct {
-	Id     string `json:"bgp_announcement_id"`
-	Prefix string
-	From   Time
-	Until  Time
+	Id           string       `json:"bgp_announcement_id"`
+	BGPConnector BGPConnector `json:"bgp_connector"`
+	Prefix       string
+	From         Time
+	Until        Time
+}
+
+type BGPConnector struct {
+	Name string `json:"bgp_connector_name"`
 }
 
 func NewAnnouncementsCollector(wgclient *wgc.Client) *AnnouncementsCollector {
 	prefix := "wanguard_announcements_"
 	return &AnnouncementsCollector{
 		wgClient:              wgclient,
-		AnnouncementActive:    prometheus.NewDesc(prefix+"active", "Active announcements at the moment", []string{"prefix", "from", "until", "announcement_id"}, nil),
+		AnnouncementActive:    prometheus.NewDesc(prefix+"active", "Active announcements at the moment", []string{"prefix", "from", "until", "announcement_id", "bgp_connector_name"}, nil),
 		AnnouncementsFinished: prometheus.NewDesc(prefix+"finished", "Total amount of finished announcements", nil, nil),
 	}
 }
@@ -47,13 +52,13 @@ func (c *AnnouncementsCollector) Collect(ch chan<- prometheus.Metric) {
 func collectActiveAnnouncements(desc *prometheus.Desc, wgclient *wgc.Client, ch chan<- prometheus.Metric) {
 	var announcements []Announcement
 
-	err := wgclient.GetParsed("bgp_announcements?status=Active&fields=prefix,from,until,bgp_announcement_id", &announcements)
+	err := wgclient.GetParsed("bgp_announcements?status=Active&fields=prefix,from,until,bgp_announcement_id,bgp_connector", &announcements)
 	if err != nil {
 		return
 	}
 
 	for _, announcement := range announcements {
-		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, 1, announcement.Prefix, announcement.From.Time, announcement.Until.Time, announcement.Id)
+		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, 1, announcement.Prefix, announcement.From.Time, announcement.Until.Time, announcement.Id, announcement.BGPConnector.Name)
 	}
 }
 
