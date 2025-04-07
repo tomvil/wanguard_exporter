@@ -6,7 +6,7 @@ require (
 	github.com/prometheus/client_golang v1.11.0
 	github.com/prometheus/common v0.26.0
 	github.com/tomvil/countries v0.0.0-20220104165753-f0d74c0c9799
-	github.com/tomvil/go-ipprotocols v0.0.0-20241014123012-278a27f8a73e
+	github.com/tomvil/go-ipprotocols v0.0.2
 )
 
 require (
