@@ -101,6 +101,8 @@ github.com/tomvil/go-ipprotocols v0.0.0-20241014123012-278a27f8a73e h1:ZKGEs1IO5
 github.com/tomvil/go-ipprotocols v0.0.0-20241014123012-278a27f8a73e/go.mod h1:U0UPn/og7dbWylgkF76EPY1gkkNo0IDnAK3dmzigLK0=
 github.com/tomvil/go-ipprotocols v0.0.2 h1:0s8bvgGbUL2R5T0+Hb6fCD7dmmU570TF/y6JH9a4FtM=
 github.com/tomvil/go-ipprotocols v0.0.2/go.mod h1:U0UPn/og7dbWylgkF76EPY1gkkNo0IDnAK3dmzigLK0=
+github.com/tomvil/go-ipprotocols v0.0.3 h1:Z5PHTCg+2YiIqv+KcCruP/yYfD/xkjMTiqGlAq35gzA=
+github.com/tomvil/go-ipprotocols v0.0.3/go.mod h1:U0UPn/og7dbWylgkF76EPY1gkkNo0IDnAK3dmzigLK0=
 golang.org/x/crypto v0.0.0-20180904163835-0709b304e793/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
