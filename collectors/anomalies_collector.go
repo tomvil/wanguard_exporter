@@ -19,21 +19,25 @@ type AnomaliesCount struct {
 }
 
 type Anomaly struct {
-	AnomalyId string `json:"anomaly_id"`
-	Prefix    string
-	Anomaly   string
-	Duration  string
-	Pkts_s    string `json:"pkts/s"`
-	Bits_s    string `json:"bits/s"`
-	Packets   string
-	Bits      string
+	AnomalyId   string `json:"anomaly_id"`
+	Prefix      string
+	Anomaly     string
+	Duration    string
+	Pkts_s      string `json:"pkts/s"`
+	Bits_s      string `json:"bits/s"`
+	Packets     string
+	Bits        string
+	LatestValue string `json:"latest_value"`
+	Sensor      struct {
+		SensorInterfaceName string `json:"sensor_interface_name"`
+	} `json:"sensor"`
 }
 
 func NewAnomaliesCollector(wgclient *wgc.Client) *AnomaliesCollector {
 	prefix := "wanguard_anomalies_"
 	return &AnomaliesCollector{
 		wgClient:          wgclient,
-		AnomalyActive:     prometheus.NewDesc(prefix+"active", "Active anomalies at the moment", []string{"prefix", "anomaly", "anomaly_id", "duration", "pkts_s", "packets", "bits_s", "bits"}, nil),
+		AnomalyActive:     prometheus.NewDesc(prefix+"active", "Active anomalies at the moment", []string{"prefix", "anomaly", "anomaly_id", "duration", "pkts_s", "packets", "bits_s", "bits", "latest_value", "sensor_interface_name"}, nil),
 		AnomaliesFinished: prometheus.NewDesc(prefix+"finished", "Number of finished anomalies", nil, nil),
 	}
 }
@@ -51,7 +55,7 @@ func (c *AnomaliesCollector) Collect(ch chan<- prometheus.Metric) {
 func collectActiveAnomalies(desc *prometheus.Desc, wgclient *wgc.Client, ch chan<- prometheus.Metric) {
 	var anomalies []Anomaly
 
-	err := wgclient.GetParsed("anomalies?status=Active&fields=anomaly_id,anomaly,prefix,duration,pkts/s,packets,bits/s,bits", &anomalies)
+	err := wgclient.GetParsed("anomalies?status=Active&fields=anomaly_id,anomaly,prefix,duration,pkts/s,packets,bits/s,bits,latest_value,sensor", &anomalies)
 	if err != nil {
 		return
 	}
@@ -65,7 +69,9 @@ func collectActiveAnomalies(desc *prometheus.Desc, wgclient *wgc.Client, ch chan
 			anomaly.Pkts_s,
 			anomaly.Packets,
 			anomaly.Bits_s,
-			anomaly.Bits)
+			anomaly.Bits,
+			anomaly.LatestValue,
+			anomaly.Sensor.SensorInterfaceName)
 	}
 }
 

@@ -75,12 +75,12 @@ wanguard_announcements_finished 1
 ### Anomalies Collector
 Metric | Type | Description | Labels
 -------|------|-------------|-------
-wanguard_anomalies_active | gauge | Active anomalies at the moment | anomaly, anomaly_id, bits, bits_s, duration, packets, pkts_s, prefix
+wanguard_anomalies_active | gauge | Active anomalies at the moment | anomaly, anomaly_id, bits, bits_s, duration, latest_value, packets, pkts_s, prefix, sensor_interface_name
 wanguard_anomalies_finished | gauge | Number of finished anomalies |
 
 Example:
 ```
-wanguard_anomalies_active{anomaly="ICMP pkts/s > 1",anomaly_id="1",bits="169576384000",bits_s="9014400",duration="60",packets="320020500",pkts_s="17500",prefix="10.10.10.10/32"} 1
+wanguard_anomalies_active{anomaly="ICMP pkts/s > 1",anomaly_id="1",bits="169576384000",bits_s="9014400",duration="60",latest_value="17500",packets="320020500",pkts_s="17500",prefix="10.10.10.10/32",sensor_interface_name="Interface 1"} 1
 wanguard_anomalies_finished 1
 ```
 
