@@ -270,6 +270,12 @@ func anomaliesPayload() string {
     "bits/s": "9014400",
     "packets": "320020500",
     "bits": "169576384000",
+    "latest_value": "130961807",
+    "sensor": {
+      "sensor_interface_name": "sFlows Filter Cluster",
+      "sensor_interface_id": "4-1-0",
+      "href": "/wanguard-api/v1/sensor_clusters/1"
+    },
     "href": "/wanguard-api/v1/anomalies/1"
   }
 ]`

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	version string = "1.6"
+	version string = "1.7"
 )
 
 type collectorsList struct {
