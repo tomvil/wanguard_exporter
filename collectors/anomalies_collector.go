@@ -9,9 +9,10 @@ import (
 )
 
 type AnomaliesCollector struct {
-	wgClient          *wgc.Client
-	AnomalyActive     *prometheus.Desc
-	AnomaliesFinished *prometheus.Desc
+	wgClient           *wgc.Client
+	AnomalyActive      *prometheus.Desc
+	AnomalyLatestValue *prometheus.Desc
+	AnomaliesFinished  *prometheus.Desc
 }
 
 type AnomaliesCount struct {
@@ -36,23 +37,25 @@ type Anomaly struct {
 func NewAnomaliesCollector(wgclient *wgc.Client) *AnomaliesCollector {
 	prefix := "wanguard_anomalies_"
 	return &AnomaliesCollector{
-		wgClient:          wgclient,
-		AnomalyActive:     prometheus.NewDesc(prefix+"active", "Active anomalies at the moment", []string{"prefix", "anomaly", "anomaly_id", "duration", "pkts_s", "packets", "bits_s", "bits", "latest_value", "sensor_interface_name"}, nil),
-		AnomaliesFinished: prometheus.NewDesc(prefix+"finished", "Number of finished anomalies", nil, nil),
+		wgClient:           wgclient,
+		AnomalyActive:      prometheus.NewDesc(prefix+"active", "Active anomalies at the moment", []string{"prefix", "anomaly", "anomaly_id", "duration", "pkts_s", "packets", "bits_s", "bits"}, nil),
+		AnomalyLatestValue: prometheus.NewDesc("wanguard_anomaly_latest_value", "Latest measurement value for active anomaly", []string{"prefix", "anomaly", "anomaly_id", "sensor_interface_name"}, nil),
+		AnomaliesFinished:  prometheus.NewDesc(prefix+"finished", "Number of finished anomalies", nil, nil),
 	}
 }
 
 func (c *AnomaliesCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- c.AnomalyActive
+	ch <- c.AnomalyLatestValue
 	ch <- c.AnomaliesFinished
 }
 
 func (c *AnomaliesCollector) Collect(ch chan<- prometheus.Metric) {
-	collectActiveAnomalies(c.AnomalyActive, c.wgClient, ch)
+	collectActiveAnomalies(c.AnomalyActive, c.AnomalyLatestValue, c.wgClient, ch)
 	collectFinishedAnomaliesTotal(c.AnomaliesFinished, c.wgClient, ch)
 }
 
-func collectActiveAnomalies(desc *prometheus.Desc, wgclient *wgc.Client, ch chan<- prometheus.Metric) {
+func collectActiveAnomalies(desc *prometheus.Desc, latestValueDesc *prometheus.Desc, wgclient *wgc.Client, ch chan<- prometheus.Metric) {
 	var anomalies []Anomaly
 
 	err := wgclient.GetParsed("anomalies?status=Active&fields=anomaly_id,anomaly,prefix,duration,pkts/s,packets,bits/s,bits,latest_value,sensor", &anomalies)
@@ -69,9 +72,15 @@ func collectActiveAnomalies(desc *prometheus.Desc, wgclient *wgc.Client, ch chan
 			anomaly.Pkts_s,
 			anomaly.Packets,
 			anomaly.Bits_s,
-			anomaly.Bits,
-			anomaly.LatestValue,
-			anomaly.Sensor.SensorInterfaceName)
+			anomaly.Bits)
+
+		if v, err := strconv.ParseFloat(anomaly.LatestValue, 64); err == nil {
+			ch <- prometheus.MustNewConstMetric(latestValueDesc, prometheus.GaugeValue, v,
+				anomaly.Prefix,
+				anomaly.Anomaly,
+				anomaly.AnomalyId,
+				anomaly.Sensor.SensorInterfaceName)
+		}
 	}
 }
 
